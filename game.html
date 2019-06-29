@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>game</title>
+    <style>
+        canvas {
+            border: 1px solid #6dd3d3;
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body onload="batDau()">
+
+
+<script>
+
+
+    let bar;
+    let ball;
+
+    function batDau() {
+
+        bar = new thanhNgang(100, 10, "red", 10, 550);
+        ball = new bong(20, 20, 10, "green", 0, 2 * Math.PI);
+        khuVucGame.start();
+    }
+
+    let khuVucGame = {
+        canvas: document.createElement("canvas"),
+        start: function () {
+            this.canvas.width = 600;
+            this.canvas.height = 600;
+            this.context = this.canvas.getContext("2d");
+            document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+            this.interval = setInterval(updateGame, 50);
+            window.addEventListener('keydown', function (e) {
+                khuVucGame.key = e.keyCode;
+            });
+            window.addEventListener('keyup', function (e) {
+                khuVucGame.key = false;
+            })
+        },
+
+        clear: function () {
+
+            this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        },
+        stop: function () {
+            clearInterval(this.interval);
+        }
+
+    };
+
+    let thanhNgang = function (width, height, color, x, y) {
+
+        this.width = width;
+        this.height = height;
+        this.x = x;
+        this.y = y;
+        this.speedX = 0;
+        this.update = function () {
+            ctx = khuVucGame.context;
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fill();
+
+        };
+        this.tocDo = function () {
+            this.x += this.speedX
+        };
+
+    };
+
+    let bong = function (x, y, radius, color, a, b) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.a = a;
+        this.b = b;
+        this.dx = 10;
+        this.dy = 10;
+        this.updateBong = function () {
+            ctx = khuVucGame.context;
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.arc(this.x, this.y, this.radius, this.a, this.b);
+            ctx.fill();
+            if (this.x < 20 || this.x > 580)
+                this.dx = -this.dx;
+            if (this.y < 20)
+                this.dy = -this.dy;
+            if (this.y > 580)
+                khuVucGame.stop();
+            this.x += this.dx;
+            this.y += this.dy;
+        };
+    };
+
+    function updateGame() {
+
+        khuVucGame.clear();
+        bar.speedX = 0;
+        if (khuVucGame.key && khuVucGame.key === 37 && bar.x > 0) {
+            bar.speedX = -20;
+        }
+        if (khuVucGame.key && khuVucGame.key === 39 && (bar.x + 100) < 600) {
+            bar.speedX = 20;
+        }
+
+        bar.update();
+        bar.tocDo();
+        ball.updateBong();
+
+        if ((ball.y + 20) > bar.y && ball.x > bar.x && ball.x < (bar.x + 100)) {
+            ball.dy = -ball.dy;
+        }
+        if (ball.y > 580) {
+            khuVucGame.stop()
+        }
+    }
+
+
+</script>
+</body>
+</html>
